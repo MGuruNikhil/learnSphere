@@ -1,0 +1,104 @@
+{
+    "courseTitle": "Advanced Machine Learning Techniques: A Deep Dive into Real-World Projects",
+    "courseSummary": "This intensive course provides a comprehensive understanding of advanced machine learning techniques through the analysis of three real-world projects: Diabetes Prediction, Fraud Detection, and Wine Quality Detection.  Participants will gain hands-on experience in data preprocessing, model training, evaluation, and comparative analysis of various algorithms.  The course emphasizes practical application and critical evaluation of results, focusing on challenges like class imbalance and real-time prediction.",
+    "chapters": [
+      {
+        "chapterTitle": "Introduction to the Summer Internship Report",
+        "chapterSummary": "This chapter provides an overview of the internship program at TechnoHacks EduTech, the project goals, and an introduction to the three main machine learning projects undertaken.",
+        "emoji": "⭐",
+        "topics": [
+          "Internship Overview",
+          "TechnoHacks EduTech",
+          "Project Goals",
+          "Project Descriptions (High-Level)",
+          "Participants and Mentors"
+        ]
+      },
+      {
+        "chapterTitle": "Data Preprocessing and Exploratory Data Analysis",
+        "chapterSummary": "This chapter delves into the techniques used for data cleaning, preparation, and exploratory analysis. It covers handling missing values, feature scaling, feature engineering, and visualization techniques used across all three projects.",
+        "emoji": "📊",
+        "topics": [
+          "Data Cleaning",
+          "Missing Value Imputation",
+          "Feature Scaling (Min-Max Scaling)",
+          "Feature Engineering",
+          "Data Visualization (Histograms, Heatmaps)",
+          "Exploratory Data Analysis",
+          "Pandas",
+          "NumPy",
+          "Scikit-learn"
+        ]
+      },
+      {
+        "chapterTitle": "Diabetes Prediction Project",
+        "chapterSummary": "A detailed exploration of the Diabetes Prediction project using Logistic Regression. This chapter covers dataset description, model training, evaluation metrics, and interpretation of results.",
+        "emoji": "💉",
+        "topics": [
+          "Dataset Description (Diabetes.csv)",
+          "Logistic Regression Model",
+          "Model Training",
+          "Evaluation Metrics (Accuracy, Precision, Recall, F1-Score)",
+          "Data Splitting (Train-Test Split)",
+          "Stratified Sampling",
+          "Binary Classification",
+          "Results Analysis"
+        ]
+      },
+      {
+        "chapterTitle": "Fraud Detection Project",
+        "chapterSummary": "This chapter focuses on the complexities of fraud detection, addressing class imbalance and real-time prediction challenges.  A Logistic Regression model is used, and its performance is critically evaluated.",
+        "emoji": "💳",
+        "topics": [
+          "Dataset Description (creditcard.csv.zip)",
+          "Class Imbalance",
+          "Logistic Regression Model",
+          "Model Training",
+          "Evaluation Metrics",
+          "Real-Time Prediction Considerations",
+          "Handling Imbalanced Datasets",
+          "Results Analysis"
+        ]
+      },
+      {
+        "chapterTitle": "Wine Quality Detection Project",
+        "chapterSummary": "This chapter compares the performance of Logistic Regression, XGBoost, and Support Vector Classifier models on a wine quality dataset.  Emphasis is placed on model comparison and selecting the best performing model.",
+        "emoji": "🍷",
+        "topics": [
+          "Dataset Description",
+          "Data Cleaning",
+          "Descriptive Statistics",
+          "Feature Correlation",
+          "Target Variable Creation",
+          "Model Training (Logistic Regression, XGBoost, SVC)",
+          "Model Comparison (Precision, Recall, F1-Score, ROC-AUC)",
+          "Model Selection",
+          "Results Analysis"
+        ]
+      },
+      {
+        "chapterTitle": "Advanced Model Evaluation and Selection",
+        "chapterSummary": "This chapter provides an in-depth discussion of various model evaluation metrics including Precision, Recall, F1-Score, ROC-AUC, and hyperparameter tuning. It also explores techniques for model selection and comparative analysis.",
+        "emoji": "🔬",
+        "topics": [
+          "Model Evaluation Metrics (Accuracy, Precision, Recall, F1-Score, ROC-AUC)",
+          "Hyperparameter Tuning",
+          "Model Selection Techniques",
+          "Classification Report",
+          "Comparative Analysis of Models"
+        ]
+      },
+      {
+        "chapterTitle": "Conclusion and Future Work",
+        "chapterSummary": "This chapter summarizes the key findings from the internship, highlights the skills developed, and suggests potential directions for future research and development.",
+        "emoji": "✅",
+        "topics": [
+          "Summary of Findings",
+          "Skills Developed",
+          "Future Research Directions",
+          "Limitations and Challenges",
+          "Contribution to the Field"
+        ]
+      }
+    ]
+}
