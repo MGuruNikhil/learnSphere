@@ -12,11 +12,15 @@ datasource db {
 
 model User {
   id         Int     @id @default(autoincrement())
-  userName   String
-  email      String
+  clerkId    String  @unique  
+  userName   String?
+  email      String  @unique
   isMember   Boolean @default(false)
   customerId String?
+ 
 }
+
+
 
 model StudyMaterial {
   id              Int      @id @default(autoincrement())

@@ -1,6 +1,6 @@
 "use client";
-
-import { cn } from "@/app/lib/utils";
+import React from "react";
+import { cn } from "../../lib/utils";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";

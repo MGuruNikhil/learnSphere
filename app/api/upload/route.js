@@ -2,7 +2,6 @@ import { supabase } from '../../lib/supabaseClient';
 import prisma from '../../lib/prisma';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Disable Next.js default body parsing so we can use request.formData()
 export const config = {
   api: {
     bodyParser: false,

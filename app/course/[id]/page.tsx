@@ -1,7 +1,7 @@
 import Chapter from "../../components/Chapter";
 import StudyMaterial from "../../components/study-material";
-import courseData from "@/course.json";
-
+import courseData from "../../../course.json";
+import React from "react";
 export default function Course() {
     return (
         <div className="max-w-5xl mx-auto px-8 py-20">

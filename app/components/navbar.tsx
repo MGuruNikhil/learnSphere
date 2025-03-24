@@ -4,7 +4,14 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "./ui/button";
-
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 export default function Appbar() {
   const [active, setActive] = useState<string | null>(null);
   const [bgOpacity, setBgOpacity] = useState(1);
@@ -61,7 +68,7 @@ export default function Appbar() {
                   <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
                 </svg>
                 <span className="hidden font-bold font-mono text-xl sm:inline-block">
-                  100<span className="text-pink-500">x</span>Photos
+                  Learn<span className="text-pink-500">Sphere</span>
                 </span>
               </Link>
             </motion.div>
@@ -76,38 +83,21 @@ export default function Appbar() {
               </Link>
 
               {/* Products */}
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  className="text-white"
-                  onClick={() => toggleDropdown("Products")}
-                >
-                  Products
+              <Link href="/upload">
+                <Button variant="ghost" className="text-white hover:cursor-pointer">
+                  Upload
                 </Button>
-              </div>
+              </Link>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="text-white hover:text-gray-400 transition">Sign In</button>
+                </SignInButton>
+              </SignedOut>
 
-              {/* Pricing */}
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  className="text-white"
-                  onClick={() => toggleDropdown("Pricing")}
-                >
-                  Pricing
-                </Button>
-                {active === "Pricing" && (
-                  <div className="absolute top-full left-0 mt-2 p-4 bg-black border border-neutral-700 rounded shadow-lg z-10">
-                    <div className="flex flex-col space-y-4 text-sm text-white">
-                      <Link href="/songs" className="hover:underline">
-                        Songs
-                      </Link>
-                      <Link href="/feed" className="hover:underline">
-                        Feed
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+
             </div>
           </div>
         </motion.div>

@@ -1,5 +1,6 @@
-import { HoverEffect } from "@/app/components/ui/card-hover-effect";
-import courseData from "@/course.json";
+import React from "react";
+import { HoverEffect } from "../components/ui/card-hover-effect";
+import courseData from "../../course.json";
 
 export default function CardHoverEffectDemo() {
   return (
