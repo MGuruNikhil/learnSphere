@@ -48,7 +48,7 @@ export default function Dashboard() {
         <div>
           <h1 className="text-2xl font-bold">Hello, {user?.fullName}</h1>
           <p className="text-lg">
-            Welcome back, it's time to get back and start learning a new course.
+            Welcome back, it&aposs time to get back and start learning a new course.
           </p>
         </div>
       </div>
