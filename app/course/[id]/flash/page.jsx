@@ -1,10 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 
 export default function FlashcardsDisplay() {
   const [flashcards, setFlashcards] = useState([]);
-  const [error, setError] = useState("");
+
+  const { id } = useParams();
+  const [courseData, setCourseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchCourseData() {
+      try {
+        const response = await fetch(`/api/courses/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch course data');
+        }
+        const data = await response.json();
+        setCourseData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCourseData();
+  }, [id]);
 
   // Sample Gemini API response (with valid JSON wrapped in a markdown code block)
   const sampleGeminiResponse = {

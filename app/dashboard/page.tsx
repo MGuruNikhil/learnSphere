@@ -51,7 +51,7 @@ export default function Dashboard() {
             Welcome back, it&aposs time to get back and start learning a new course.
           </p>
         </div>
-        <Link href="/create">
+        <Link href="/course">
         <button className="px-6 py-2 rounded-md text-lg font-semibold shadow-md text-pink-500 cursor-pointer">
             + Create New
         </button>

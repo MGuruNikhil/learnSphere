@@ -13,7 +13,6 @@ export default function UploadPage() {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-
   const handleFileChange = (e) => {
     setPdfFiles(e.target.files);
   };
@@ -28,9 +27,8 @@ export default function UploadPage() {
     formData.append("msg", msg);
     formData.append("courseType", courseType);
     formData.append("difficultyLevel", difficultyLevel);
-    formData.append("userName", "your-username"); 
+    formData.append("userName", "your-username");
 
-    // Append each selected PDF file
     for (let i = 0; i < pdfFiles.length; i++) {
       formData.append("pdfFiles", pdfFiles[i]);
     }
@@ -55,71 +53,70 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="py-20">
-      <h1>Generate Course Material</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>
-            Message:{" "}
-            <input
-              type="text"
-              value={msg}
-              onChange={(e) => setMsg(e.target.value)}
-              required
-              className="border border-white rounded-md p-1 "
-            />
-          </label>
+    <div className="flex flex-col items-center justify-center min-h-screen text-white p-6">
+      <h1 className="text-3xl font-bold mb-6">Generate Course Material</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg p-6 rounded-lg shadow-md"
+      >
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Message:</label>
+          <input
+            type="text"
+            value={msg}
+            onChange={(e) => setMsg(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md  focus:outline-none focus:ring-2"
+          />
         </div>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>
-            Course Type:{" "}
-            <input
-              type="text"
-              value={courseType}
-              onChange={(e) => setCourseType(e.target.value)}
-              required
-              className="border border-white rounded-md p-1 "
-
-            />
-          </label>
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Course Type:</label>
+          <input
+            type="text"
+            value={courseType}
+            onChange={(e) => setCourseType(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 "
+          />
         </div>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>
-            Difficulty Level:{" "}
-            <input
-              type="text"
-              value={difficultyLevel}
-              onChange={(e) => setDifficultyLevel(e.target.value)}
-              required
-              className="border border-white rounded-md p-1 "
-            />
-          </label>
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Difficulty Level:</label>
+          <input
+            type="text"
+            value={difficultyLevel}
+            onChange={(e) => setDifficultyLevel(e.target.value)}
+            required
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 "
+          />
         </div>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>
-            PDF Files:{" "}
-            <input
-              type="file"
-              onChange={handleFileChange}
-              multiple
-              required
-              accept="application/pdf"
-            />
-          </label>
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">PDF Files:</label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            multiple
+            required
+            accept="application/pdf"
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 "
+          />
         </div>
-        <button type="submit" disabled={loading}>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2 mt-2 rounded-md transition disabled:bg-gray-500"
+        >
           {loading ? "Processing..." : "Submit"}
         </button>
       </form>
       {error && (
-        <div style={{ marginTop: "1rem", color: "red" }}>
+        <div className="mt-4 p-3 bg-red-600 text-white rounded-md">
           <strong>Error:</strong> {error}
         </div>
       )}
       {result && (
-        <div style={{ marginTop: "1rem" }}>
-          <h2>Generated Course Outline</h2>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+        <div className="mt-6 p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-2">Generated Course Outline</h2>
+          <pre className="overflow-auto p-3 rounded-md text-sm">{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}
     </div>
