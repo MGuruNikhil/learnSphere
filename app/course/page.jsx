@@ -66,7 +66,7 @@ export default function UploadPage() {
             value={msg}
             onChange={(e) => setMsg(e.target.value)}
             required
-            className="w-full p-2 border rounded-md  focus:outline-none focus:ring-2"
+            className="w-full p-2 border rounded-md  focus:outline-none focus:ring-2 border-transparent dark:border-white/[0.2] group-hover:border-slate-700"
           />
         </div>
         <div className="mb-4">
@@ -76,7 +76,7 @@ export default function UploadPage() {
             value={courseType}
             onChange={(e) => setCourseType(e.target.value)}
             required
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 "
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 border-transparent dark:border-white/[0.2] group-hover:border-slate-700"
           />
         </div>
         <div className="mb-4">
@@ -86,7 +86,7 @@ export default function UploadPage() {
             value={difficultyLevel}
             onChange={(e) => setDifficultyLevel(e.target.value)}
             required
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 "
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 border-transparent dark:border-white/[0.2] group-hover:border-slate-700"
           />
         </div>
         <div className="mb-4">
@@ -97,13 +97,14 @@ export default function UploadPage() {
             multiple
             required
             accept="application/pdf"
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 "
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 border-transparent dark:border-white/[0.2] group-hover:border-slate-700"
           />
         </div>
         <button
+          
           type="submit"
           disabled={loading}
-          className="w-full py-2 mt-2 rounded-md transition disabled:bg-gray-500"
+          className="w-full py-2 mt-2 rounded-md transition disabled:bg-gray-500 text-pink-500 cursor-pointer hover:bg-pink-500 hover:text-white"
         >
           {loading ? "Processing..." : "Submit"}
         </button>
@@ -111,12 +112,6 @@ export default function UploadPage() {
       {error && (
         <div className="mt-4 p-3 bg-red-600 text-white rounded-md">
           <strong>Error:</strong> {error}
-        </div>
-      )}
-      {result && (
-        <div className="mt-6 p-4 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-2">Generated Course Outline</h2>
-          <pre className="overflow-auto p-3 rounded-md text-sm">{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}
     </div>

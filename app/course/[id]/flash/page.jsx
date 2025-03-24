@@ -30,7 +30,6 @@ export default function FlashcardsDisplay() {
     fetchCourseData();
   }, [id]);
 
-  // Sample Gemini API response (with valid JSON wrapped in a markdown code block)
   const sampleGeminiResponse = {
     "candidates": [
       {

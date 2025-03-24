@@ -80,7 +80,7 @@ export default function Dashboard() {
         <div className="mt-6 space-y-6">
           {courses.map((course) => (
             <div
-              key={course.id}
+              key={course._id}
               className="p-6 gap-2 rounded-lg shadow-md flex justify-between items-center w-full border border-transparent dark:border-white/[0.2] group-hover:border-slate-700"
             >
               <div className="flex flex-col gap-2">

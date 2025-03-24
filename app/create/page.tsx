@@ -70,7 +70,7 @@ export default function CreateCourse() {
   };
 
   return (
-    <div className="flex flex-col items-center p-5 md:px-24 lg:px-36 mt-20">
+    <div className="flex flex-col items-center p-5 md:px-24 lg:px-36 mt-20 py-20">
       <h2 className="font-bold text-4xl text-primary">
         Start Building your Personal Study Material
       </h2>
