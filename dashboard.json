@@ -1,0 +1,35 @@
+[
+    {
+      "id": 1,
+      "title": "Data Structures and Algorithms",
+      "description": "This course provides a moderate-level introduction to data structures and algorithms.",
+      "status": "Ready",
+      "progress": 80,
+      "image": "https://example.com/course-image1.png"
+    },
+    {
+      "id": 2,
+      "title": "Web Development Fundamentals",
+      "description": "Learn the basics of HTML, CSS, and JavaScript for building web applications.",
+      "status": "Ready",
+      "progress": 65,
+      "image": "https://example.com/course-image2.png"
+    },
+    {
+      "id": 3,
+      "title": "Introduction to Machine Learning",
+      "description": "Get started with machine learning concepts, algorithms, and practical implementations.",
+      "status": "In Progress",
+      "progress": 45,
+      "image": "https://example.com/course-image3.png"
+    },
+    {
+      "id": 4,
+      "title": "Database Management Systems",
+      "description": "Understand database design, SQL queries, and database normalization techniques.",
+      "status": "Completed",
+      "progress": 100,
+      "image": "https://example.com/course-image4.png"
+    }
+  ]
+  
