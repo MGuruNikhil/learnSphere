@@ -2,19 +2,13 @@ import { NextResponse } from "next/server";
 import { supabase } from "../../lib/supabaseClient";
 import { courseOutlineAIModel } from "../../../configs/AiModel";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import { MongoClient } from "mongodb";
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
-
-// Dummy helper function to simulate extracting text parts from a PDF given its public URL.
-
-
-// Dummy model to simulate combining text parts. Replace with your actual implementation if available.
-
 
 export async function POST(req) {
   try {
@@ -23,7 +17,7 @@ export async function POST(req) {
     const pdfFiles = formData.getAll("pdfFiles");
     const courseType = formData.get("courseType");
     const difficultyLevel = formData.get("difficultyLevel");
-    const userName = formData.get("userName"); // Ensure that your frontend includes this field if needed
+    const userName = formData.get("userName");
 
     // Validate required fields
     if (!msg || !userName || !courseType || !difficultyLevel || pdfFiles.length === 0) {
@@ -38,12 +32,9 @@ export async function POST(req) {
       if (!userName || !pdfFile || typeof pdfFile === "string") {
         throw new Error("Missing required fields");
       }
-      // Convert the PDF Blob to a Buffer
       const fileBuffer = Buffer.from(await pdfFile.arrayBuffer());
-      // Create a unique filename using a timestamp and the original file name
       const fileName = `${Date.now()}-${pdfFile.name}`;
 
-      // Upload the file buffer to Supabase Storage (ensure the bucket "pdfs" exists)
       const { error: uploadError } = await supabase.storage
         .from("pdfs")
         .upload(fileName, fileBuffer, { contentType: pdfFile.type });
@@ -53,7 +44,6 @@ export async function POST(req) {
         throw new Error("Error uploading file to Supabase");
       }
 
-      // Retrieve the public URL for the uploaded file.
       const { data: urlData, error: urlError } = supabase.storage
         .from("pdfs")
         .getPublicUrl(fileName);
@@ -68,7 +58,6 @@ export async function POST(req) {
       return { publicURL, fileName };
     };
 
-    // Process all uploaded files concurrently
     const processAllFiles = async (pdfFiles, userName) => {
       const filesArray = Array.from(pdfFiles);
       const results = await Promise.all(
@@ -93,7 +82,6 @@ export async function POST(req) {
       };
     }
 
-    // Create parts for the AI prompt using each public URL
     const parts = await Promise.all(
       publicUrlsArray.map(async ({ publicURL }) => await remotePdfToPart(publicURL))
     );
@@ -121,6 +109,25 @@ export async function POST(req) {
     const aiResp = await courseOutlineAIModel.sendMessage(PROMPT);
     console.log("aiResp:", aiResp);
     const aiResult = JSON.parse(aiResp.response.text());
+
+    const client = new MongoClient(process.env.DATABASE_URL);
+    try {
+      await client.connect();
+      const db = client.db("courseDB");
+      const collection = db.collection("courseOutlines");
+      await collection.insertOne({
+        userName,
+        courseType,
+        difficultyLevel,
+        outline: aiResult,
+        createdAt: new Date(),
+      });
+    } catch (dbError) {
+      console.error("Error saving course outline to MongoDB:", dbError);
+      // Optionally, you can decide to fail the request or continue to return the outline
+    } finally {
+      await client.close();
+    }
 
     // Return the generated course outline as JSON
     return new NextResponse(JSON.stringify(aiResult), {
