@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "postinstall": "prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -20,7 +21,11 @@
     "clsx": "^2.1.1",
     "formidable": "^3.5.2",
     "framer-motion": "^12.5.0",
+<<<<<<< HEAD
     "lucide-react": "^0.483.0",
+=======
+    "mongodb": "^6.15.0",
+>>>>>>> 2b1597fdb141e7534e0b8b50973789b20a8b13a1
     "motion": "^12.5.0",
     "multer": "^1.4.5-lts.2",
     "next": "^15.2.3",

@@ -33,7 +33,6 @@
     "/.ts",
     "/.tsx",
     "app/api/sound-generater/route.js",
-    "app/api/upload/route.js",
     "app/course/page.jsx",
     "app/lib/prisma.js",
     "app/upload/page.jsx",
