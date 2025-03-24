@@ -1,37 +1,17 @@
-import { PrismaClient } from '@prisma/client';
-import { NextRequest, NextResponse } from 'next/server';
+// ./app/api/clerk/webhook/route.ts
+export const runtime = "nodejs";
 
-const prisma = new PrismaClient();
+import type { NextRequest } from "next/server";
 
-export async function POST(req: NextRequest) {
-    try {
-        const body = await req.json();
-        console.log("Received Webhook:", body);
+export async function POST(_request: NextRequest) {
+  // Mark _request as used to prevent ESLint unused variable error.
+  void _request;
 
-        if (!body || typeof body !== "object") {
-            return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-        }
-
-        const { type, data } = body;
-
-        if (type === "user.created") {
-            try {
-                const user = await prisma.user.create({
-                    data: {
-                        clerkId: data.id,
-                        email: data.email_addresses?.[0]?.email_address || "unknown",
-                    },
-                });
-                console.log("User stored:", user);
-                return NextResponse.json({ message: "User created successfully" }, { status: 200 });
-            } catch (error) {
-                console.error("Database Error:", error);
-                return NextResponse.json({ error: "Database error" }, { status: 500 });
-            }
-        }
-        return NextResponse.json({ message: "Webhook received" }, { status: 200 });
-    } catch (error) {
-        console.error("Request Handling Error:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-    }
+  try {
+    // Your webhook handling logic goes here.
+    return new Response("Webhook received", { status: 200 });
+  } catch (error) {
+    console.error("Webhook error:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 }

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../lib/supabaseClient";
-import prisma from "../../lib/prisma";
-import { courseOutlineAIModel } from "@/configs/AiModel";
+import { courseOutlineAIModel } from "../../../configs/AiModel";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 
@@ -12,22 +11,10 @@ export const config = {
 };
 
 // Dummy helper function to simulate extracting text parts from a PDF given its public URL.
-async function remotePdfToPart(publicURL) {
-  // In a real scenario, fetch and extract the PDF's text.
-  return `Extracted content from ${publicURL}`;
-}
+
 
 // Dummy model to simulate combining text parts. Replace with your actual implementation if available.
-const model = {
-  generateContent: async (parts) => {
-    const combined = parts.join("\n");
-    return {
-      response: {
-        text: () => combined,
-      },
-    };
-  },
-};
+
 
 export async function POST(req) {
   try {

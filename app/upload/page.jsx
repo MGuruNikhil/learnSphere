@@ -56,7 +56,7 @@ export default function Upload() {
             placeholder="Your name"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
-            disabled
+            
           />
           <input
             type="file"

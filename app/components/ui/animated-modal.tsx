@@ -96,7 +96,7 @@ export const ModalBody = ({
             opacity: 0,
             backdropFilter: "blur(0px)",
           }}
-          className="fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full  flex items-center justify-center z-50"
+          className="fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full flex items-center justify-center z-50"
         >
           <Overlay />
 
@@ -218,15 +218,14 @@ const CloseIcon = () => {
 };
 
 // Hook to detect clicks outside of a component.
-// Add it in a separate file, I've added here for simplicity
 export const useOutsideClick = (
   ref: React.RefObject<HTMLDivElement | null>,
-  callback: Function
+  callback: (event: MouseEvent | TouchEvent) => void
 ) => {
   useEffect(() => {
-    const listener = (event: any) => {
-      // DO NOTHING if the element being clicked is the target element or their children
-      if (!ref.current || ref.current.contains(event.target)) {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      // Do nothing if clicking inside the element or its children.
+      if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
       callback(event);
