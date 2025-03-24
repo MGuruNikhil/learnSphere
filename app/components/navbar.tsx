@@ -5,20 +5,15 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import {
-  ClerkProvider,
   SignInButton,
-  SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
 export default function Appbar() {
-  const [active, setActive] = useState<string | null>(null);
   const [bgOpacity, setBgOpacity] = useState(1);
 
-  const toggleDropdown = (item: string) => {
-    setActive(active === item ? null : item);
-  };
+  
 
   useEffect(() => {
     const handleScroll = () => {
