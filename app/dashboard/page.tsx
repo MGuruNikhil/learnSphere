@@ -2,7 +2,7 @@
 
 import { useUser, SignInButton } from "@clerk/nextjs";
 import React from "react";
-
+import Link from "next/link";
 const courses = [
   {
     id: 1,
@@ -44,13 +44,19 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col items-center py-20 rounded-lg">
       {/* Header Section */}
-      <div className="shadow-lg p-6 w-full max-w-4xl flex items-center gap-6 rounded-lg ">
+      <div className="shadow-lg p-6 w-full max-w-4xl flex items-center justify-between gap-6 rounded-lg ">
         <div>
           <h1 className="text-2xl font-bold">Hello, {user?.fullName}</h1>
           <p className="text-lg">
             Welcome back, it's time to get back and start learning a new course.
           </p>
         </div>
+        <Link href="/create">
+        <button className="px-6 py-2 rounded-md text-lg font-semibold shadow-md text-pink-500 cursor-pointer">
+            + Create New
+        </button>
+        </Link>
+       
       </div>
 
       {/* Courses Section */}

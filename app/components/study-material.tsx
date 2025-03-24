@@ -1,49 +1,58 @@
+import Link from "next/link";
+import React from "react";
 interface MaterialProps {
     status: string;
     icon: string;
     title: string;
     description: string;
+    link: string;
 }
 
-function Material({ status, icon, title, description }: MaterialProps) {
+function Material({ status, icon, title, description, link }: MaterialProps) {
     return (
         <div className=" border border-transparent dark:border-white/[0.2] group-hover:border-slate-700 shadow-sm rounded-md p-5 flex flex-col items-center hover:border-gray-300 transition-colors">
             <h1 className="p-1 px-2 bg-green-500 text-white rounded-full text-[10px] mb-2">{status}</h1>
             <p className="text-5xl">{icon}</p>
             <h2 className="font-medium mt-3">{title}</h2>
             <p className="text-gray-500 text-sm text-center">{description}</p>
-            <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 mt-3 w-full">
-                View
-            </button>
+            <Link href={link} className="cursor-pointer">
+                <button className="cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 mt-3 w-full">
+                    View
+                </button>
+            </Link>
         </div>
     );
 }
 
-export default function StudyMaterial() {
+export default function StudyMaterial({ id } : { id: string | undefined }) {
     const materials = [
         {
             status: "Ready",
             icon: "📚",
             title: "Notes/Chapters",
-            description: "Read notes to prepare"
+            description: "Read notes to prepare",
+            link: "/course/"+id+"/notes/"
         },
         {
             status: "Ready",
             icon: "🗃️",
             title: "Flashcard",
-            description: "Flashcards help to remember the concepts"
+            description: "Flashcards help to remember the concepts",
+            link: "/course/"+id+"/flash/"
         },
         {
             status: "Ready",
             icon: "📝",
             title: "Quiz",
-            description: "Great way to test your knowledge"
+            description: "Great way to test your knowledge",
+            link: "/course/"+id+"/quiz/"
         },
         {
             status: "Ready",
             icon: "❓",
             title: "Question/Answer",
-            description: "Help to practice your learning"
+            description: "Help to practice your learning",
+            link: "/course/"+id+"/qna/"
         }
     ];
 
@@ -58,6 +67,7 @@ export default function StudyMaterial() {
                         icon={material.icon}
                         title={material.title}
                         description={material.description}
+                        link={material.link}
                     />
                 ))}
             </div>
