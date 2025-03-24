@@ -111,11 +111,12 @@ export async function POST(req) {
     const aiResult = JSON.parse(aiResp.response.text());
 
     const client = new MongoClient(process.env.DATABASE_URL);
+    let data;
     try {
       await client.connect();
       const db = client.db("courseDB");
       const collection = db.collection("courseOutlines");
-      await collection.insertOne({
+      data = await collection.insertOne({
         userName,
         courseType,
         difficultyLevel,
@@ -130,7 +131,7 @@ export async function POST(req) {
     }
 
     // Return the generated course outline as JSON
-    return new NextResponse(JSON.stringify(aiResult), {
+    return new NextResponse(JSON.stringify(data), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

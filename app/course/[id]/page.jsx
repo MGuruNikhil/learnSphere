@@ -1,32 +1,43 @@
-// app/course/[id]/page.jsx
+"use client";
 
 import Chapter from "../../components/Chapter";
 import StudyMaterial from "../../components/study-material";
-import React from "react";
-import { MongoClient, ObjectId } from "mongodb";
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-// Helper function to fetch the course data from MongoDB
+export default function Course() {
+  const { id } = useParams();
+  const [courseData, setCourseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-async function getCourseData(id) {
-  const uri = process.env.DATABASE_URL;
-  if (!uri) {
-    throw new Error("Missing MONGO_URI in environment variables");
+  useEffect(() => {
+    async function fetchCourseData() {
+      try {
+        const response = await fetch(`/api/courses/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch course data');
+        }
+        const data = await response.json();
+        setCourseData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCourseData();
+  }, [id]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
-  const client = await MongoClient.connect(uri);
-  const db = client.db("courseDB"); // Use your specific database name
-  // Use your specific collection name where the course outlines are stored.
-  const course = await db.collection("courseOutlines").findOne({ _id: new ObjectId(id) });
-  await client.close();
-  return course;
-}
 
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
-// This is now an async server component. Next.js will pass the route params to it.
-export default async function Course({ params }) {
-  const { id } = params;
-  const courseData = await getCourseData(id);
-
-  // Ensure courseData exists and has the expected structure
   if (!courseData) {
     return <p>Course not found</p>;
   }

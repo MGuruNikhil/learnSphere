@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UploadPage() {
   const [msg, setMsg] = useState("");
@@ -10,6 +11,8 @@ export default function UploadPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const router = useRouter();
+
 
   const handleFileChange = (e) => {
     setPdfFiles(e.target.files);
@@ -43,6 +46,7 @@ export default function UploadPage() {
         throw new Error(data.error || "Something went wrong");
       }
       setResult(data);
+      router.push(`/course/${data.insertedId}`);
     } catch (err) {
       console.error("Error submitting form:", err);
       setError(err.message);

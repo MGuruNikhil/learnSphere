@@ -7,10 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import { FileUpload } from "../../components/ui/upload";
 
 interface TopicInputProps {
   setTopic: (topic: string) => void;
   setDifficultyLevel: (level: string) => void;
+  handleFileChange: (files: File[]) => void;
 }
 
 const TopicInput: React.FC<TopicInputProps> = ({ setTopic, setDifficultyLevel }) => {
@@ -31,12 +33,14 @@ const TopicInput: React.FC<TopicInputProps> = ({ setTopic, setDifficultyLevel })
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Difficulty Level" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent  className="absolute z-50 bg-black">
           <SelectItem value="Easy">Easy</SelectItem>
           <SelectItem value="Moderate">Moderate</SelectItem>
           <SelectItem value="Hard">Hard</SelectItem>
+          
         </SelectContent>
       </Select>
+      <FileUpload/>
     </div>
   );
 };

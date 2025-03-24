@@ -9,6 +9,7 @@ import {
 } from "./ui/animated-modal";
 import Image from "next/image";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 export function AnimatedModalDemo() {
   const images = [
@@ -23,11 +24,13 @@ export function AnimatedModalDemo() {
       <Modal>
         <ModalTrigger className="bg-black dark:bg-white dark:text-black text-white flex justify-center group/modal-btn">
           <span className="group-hover/modal-btn:translate-x-40 text-center transition duration-500">
-            Get Started
+            <Link href={"/dashboard"}> Dashboard </Link>
           </span>
+          <Link href={"/dashboard"}>
           <div className="-translate-x-40 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">
           🚀 📓 🚀
           </div>
+          </Link>
         </ModalTrigger>
         <ModalBody>
           <ModalContent>

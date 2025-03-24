@@ -77,10 +77,9 @@ export default function Appbar() {
                 </Button>
               </Link>
 
-              {/* Products */}
-              <Link href="/upload">
+              <Link href="/dashboard">
                 <Button variant="ghost" className="text-white hover:cursor-pointer">
-                  Upload
+                  Dashboard
                 </Button>
               </Link>
               <SignedIn>
