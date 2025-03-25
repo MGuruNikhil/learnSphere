@@ -91,7 +91,7 @@ Please generate flashcards as a JSON array, where each flashcard is an object wi
       {!loading && flashcards.length > 0 ? (
         <HoverEffect items={transformedFlashcards} />
       ) : (
-        !loading && <p className="text-white">No flashcards available.</p>
+        !loading && <p className="text-white">Loading course data...</p>
       )}
     </div>
   );

@@ -114,7 +114,7 @@ Based on the course outline above, generate a new set of descriptive questions a
   }, [courseData]);
 
   return (
-    <div className="px-4 bg-black min-h-screen py-20">
+    <div className="max-w-5xl mx-auto px-8 py-20">
       <h1 className="text-2xl font-bold mb-4 text-white">Descriptive Q&A</h1>
       {loading && <p className="text-white">Loading course data...</p>}
       {error && (
@@ -123,14 +123,14 @@ Based on the course outline above, generate a new set of descriptive questions a
       {!loading && descriptiveQA.length > 0 ? (
         <div className="flex flex-col gap-4">
           {descriptiveQA.map((item, idx) => (
-            <div key={idx} className="border border-gray-700 rounded p-4 bg-gray-900">
-              <div className="font-bold mb-2 text-white">{item.question}</div>
-              <div className="text-gray-300">{item.answer}</div>
+            <div key={idx} className="border border-transparent dark:border-white/[0.2] group-hover:border-slate-700 rounded-lg p-4">
+              <div className="font-bold mb-2 text-white">Q. {item.question}</div>
+              <div className="text-gray-300">A. {item.answer}</div>
             </div>
           ))}
         </div>
       ) : (
-        !loading && <p className="text-white">No descriptive questions and answers generated.</p>
+        !loading && <p className="text-white">Loading course data...</p>
       )}
     </div>
   );
