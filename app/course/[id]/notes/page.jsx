@@ -30,6 +30,34 @@ export default function DescriptiveQA() {
     fetchCourseData();
   }, [id]);
 
+  // Fetch notes by courseId
+  async function fetchNotes(courseId) {
+    try {
+      const response = await fetch(`/api/notes/${courseId}`);
+      if (response.ok) {
+        const data = await response.json();
+        // Assuming your API returns { notes: [...] }
+        return data.notes;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Save notes to the database
+  async function saveNotes(courseId, notes) {
+    try {
+      await fetch(`/api/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId, notes }),
+      });
+    } catch (err) {
+      console.error("Failed to save notes:", err);
+    }
+  }
+
   // Helper function to extract JSON content from a markdown code block
   const extractJSONFromCodeBlock = (text) => {
     const regex = /```json\s*([\s\S]*?)\s*```/;
@@ -41,6 +69,14 @@ export default function DescriptiveQA() {
   useEffect(() => {
     async function generateDescriptiveQA() {
       if (!courseData) return;
+
+      // Check if notes already exist
+      const existingNotes = await fetchNotes(id);
+      if (existingNotes && Array.isArray(existingNotes)) {
+        setDescriptiveQA(existingNotes);
+        return; 
+      }
+
       try {
         // Construct a detailed prompt that includes course data and examples for descriptive pages
         const prompt = `You are provided with a course outline and details below. Your task is to generate a structured textbook-style content breakdown, organized by chapters and pages, with each page containing 250-300 words.
@@ -95,51 +131,56 @@ Below is an example of the expected output:
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const result = await model.generateContent(prompt);
 
-        // Assume the response is in a markdown code block with JSON content
-        const responseText = result.response.text();
+        // Wait for the response text (if needed)
+        const responseText = await result.response.text();
         const jsonString = extractJSONFromCodeBlock(responseText);
         const parsedDescriptiveQA = JSON.parse(jsonString);
-        setDescriptiveQA(parsedDescriptiveQA);
+
+        console.log("Parsed descriptiveQA:", parsedDescriptiveQA);
+
+        // If the parsed result is not an array but an object containing an array, adjust accordingly.
+        const notesArray = Array.isArray(parsedDescriptiveQA)
+          ? parsedDescriptiveQA
+          : parsedDescriptiveQA.notes || [];
+
+        // Save notes to the database
+        await saveNotes(id, notesArray);
+
+        setDescriptiveQA(notesArray);
       } catch (err) {
         setError(err.message || "Error generating descriptive pages");
       }
     }
     generateDescriptiveQA();
-  }, [courseData]);
+  }, [courseData, id]);
 
   return (
-    <div className="px-4 bg-black min-h-screen py-20">
+    <div className="max-w-5xl mx-auto px-8 py-20">
       <h1 className="text-2xl font-bold mb-4 text-white">Course Content</h1>
       {loading && <p className="text-white">Loading course data...</p>}
-      {error && (
-        <pre className="text-red-400 bg-gray-800 p-4 rounded">{error}</pre>
-      )}
-      {!loading && descriptiveQA.length > 0 ? (
+      {error && <p className="text-red-500">{error}</p>}
+      {!loading && Array.isArray(descriptiveQA) && descriptiveQA.length > 0 ? (
         <div className="flex flex-col gap-8">
           {descriptiveQA.map((chapter, chapterIdx) => (
             <div key={chapterIdx} className="border border-gray-700 rounded p-4 bg-gray-900">
               <h2 className="text-xl font-bold mb-2 text-white">
                 Chapter: {chapter.chapter}
               </h2>
-              {chapter.pages && chapter.pages.length > 0 ? (
-                chapter.pages.map((page, pageIdx) => (
-                  <div key={pageIdx} className="mb-4 p-4 border border-gray-600 rounded bg-gray-800">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-semibold text-white">
-                        Page {page.pageNumber}: {page.title}
-                      </span>
-                    </div>
-                    <p className="text-gray-300">{page.content}</p>
+              {chapter.pages.map((page, pageIdx) => (
+                <div key={pageIdx} className="mb-4 p-4 border border-gray-600 rounded bg-gray-800">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold text-white">
+                      Page {page.pageNumber}: {page.title}
+                    </span>
                   </div>
-                ))
-              ) : (
-                <p className="text-white">No pages available for this chapter.</p>
-              )}
+                  <p className="text-gray-300">{page.content}</p>
+                </div>
+              ))}
             </div>
           ))}
         </div>
       ) : (
-        !loading && <p className="text-white">No descriptive pages generated.</p>
+        !loading && <p className="text-white">No notes available</p>
       )}
     </div>
   );
