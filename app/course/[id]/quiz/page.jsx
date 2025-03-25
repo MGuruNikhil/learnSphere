@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { GoogleGenerativeAI } from "@google/generative-ai"; // Ensure you've installed this package
+import QuizCardItem from "./QuizCardItem";
+import StepProgress from "./StepProgress";
 
 export default function QuizKingDisplay() {
   const { id } = useParams();
@@ -10,6 +12,11 @@ export default function QuizKingDisplay() {
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // UI state for quiz interaction
+  const [stepCount, setStepCount] = useState(0);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
+  const [correctAnswer, setCorrectAnswer] = useState("");
 
   // Fetch course data from API endpoint
   useEffect(() => {
@@ -42,7 +49,6 @@ export default function QuizKingDisplay() {
     async function generateQuizQuestions() {
       if (!courseData) return;
       try {
-        // Construct a detailed prompt that includes course data and example quiz questions
         const prompt = `
 You are provided with a course outline and details below. Your task is to generate a set of quiz questions that test understanding of the course content.
 
@@ -138,29 +144,84 @@ Based on the course outline above, generate a new set of quiz questions.
     generateQuizQuestions();
   }, [courseData]);
 
+  const checkAnswer = (selectedOption, currentQuiz) => {
+    if (selectedOption === currentQuiz.correctAnswer) {
+      setIsCorrectAnswer(true);
+    } else {
+      setIsCorrectAnswer(false);
+      setCorrectAnswer(currentQuiz.correctAnswer);
+    }
+
+    // Move to the next question after a short delay
+    setTimeout(() => {
+      if (stepCount < quizQuestions.length - 1) {
+        setStepCount((prevStep) => prevStep + 1);
+        setIsCorrectAnswer(null); // Reset the answer state for the next question
+      }
+    }, 1000); // Adjust the delay as needed
+  };
+
+  const goToCoursePage = () => {
+    // Navigate to course page (adjust the URL as needed)
+    window.location.href = `/courses/${id}`;
+  };
+
   return (
-    <div className="px-4 bg-black min-h-screen py-20">
+    <div className="max-w-5xl mx-auto px-8 py-20">
       <h1 className="text-2xl font-bold mb-4 text-white">Quiz King</h1>
-      {loading && <p className="text-white">Loading course data...</p>}
+      {loading && <p className="text-white">Loading Quiz...</p>}
       {error && (
         <pre className="text-red-400 bg-gray-800 p-4 rounded">{error}</pre>
       )}
       {!loading && quizQuestions.length > 0 ? (
-        <div className="flex flex-col gap-4">
-          {quizQuestions.map((question, idx) => (
-            <div key={idx} className="border border-gray-700 rounded p-4 bg-gray-900">
-              <div className="font-bold mb-2 text-white">{question.question}</div>
-              <ul className="list-disc list-inside">
-                {question.options.map((option, optIdx) => (
-                  <li key={optIdx} className="text-gray-300">{option}</li>
-                ))}
-              </ul>
-              <div className="mt-2 text-green-400">Answer: {question.correctAnswer}</div>
+        <>
+          <StepProgress
+            data={quizQuestions}
+            stepCount={stepCount}
+            setStepCount={(value) => {
+              setStepCount(value);
+              setIsCorrectAnswer(null); // reset answer state on step change
+            }}
+          />
+
+          <div>
+            <QuizCardItem
+              className="mt-10 mb-5"
+              quiz={quizQuestions[stepCount]}
+              userSelectedOption={(v) =>
+                checkAnswer(v, quizQuestions[stepCount])
+              }
+            />
+          </div>
+          {isCorrectAnswer === false && (
+            <div className="border p-3 border-red-700 bg-red-200 rounded-lg mt-16">
+              <h2 className="font-bold text-lg text-red-600">Incorrect</h2>
+              <p className="text-red-600">
+                Correct answer is {correctAnswer}
+              </p>
             </div>
-          ))}
-        </div>
+          )}
+          {isCorrectAnswer === true && (
+            <div className="border p-3 border-green-700 bg-green-200 rounded-lg">
+              <h2 className="font-bold text-lg text-green-600">Correct</h2>
+              <p className="text-green-600">Your answer is correct</p>
+            </div>
+          )}
+
+          {/* Show "Go to Course Page" button on the last quiz question */}
+          {stepCount === quizQuestions.length - 1 && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={goToCoursePage}
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md"
+              >
+                Go to Course Page
+              </button>
+            </div>
+          )}
+        </>
       ) : (
-        !loading && <p className="text-white">No quiz questions generated.</p>
+        !loading && <p className="text-white">Loading Quiz...</p>
       )}
     </div>
   );
