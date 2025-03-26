@@ -1,10 +1,12 @@
 import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(request, { params }) {
+export async function GET(request, contextPromise) {
   try {
-    // Await params to get the dynamic route parameter
-    const id = await params.id;
+    // First, await the context promise
+    const context = await contextPromise;
+    // Then, access the params property
+    const id = context.params.id;
     const uri = process.env.DATABASE_URL;
     
     if (!uri) {

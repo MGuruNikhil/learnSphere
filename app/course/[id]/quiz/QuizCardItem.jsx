@@ -1,30 +1,43 @@
 import React, { useState } from "react";
 
-function QuizCardItem({ quiz, userSelectedOption }) {
-  const [selectedOption, setSelectedOption] = useState();
+function QuizCardItem({ quiz, userSelectedOption, disableOptions }) {
+  const [selectedOption, setSelectedOption] = useState(null);
+
   return (
-    <div className="mt-10 p-5">
-      <h2 className="font-bold text-3xl text-center mb-5 text-[#ffffff]">
+    <div>
+      {/* Question */}
+      <h2 className="font-bold text-xs sm:text-2xl text-center mb-6 text-white">
         {quiz?.question}
       </h2>
 
-      <div className="grid grid-cols-2 gap-5 mt-8">
+      {/* Options */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {quiz?.options?.map((option, index) => (
-          <h2
+          <div
+            key={index}
             onClick={() => {
+              // If already disabled, do nothing
+              if (disableOptions) return;
+
               setSelectedOption(option);
               userSelectedOption(option);
             }}
-            key={index}
-            className={`border rounded-full p-3 px-3 text-center text-lg cursor-pointer transition-colors
+            className={`flex items-center justify-center p-4 min-h-[60px] rounded-md transition-colors
+              ${
+                disableOptions
+                  ? "cursor-not-allowed" // No pointer if disabled
+                  : "cursor-pointer"
+              }
               ${
                 selectedOption === option
-                  ? "bg-[#2196F3] text-[#FFFFFF]" // Blue for selected
-                  : "bg-[#F5F5F5] text-[#171717] hover:bg-[#E0E0E0]" // Light gray for default
+                  ? // Selected style
+                    "bg-blue-500 text-white border border-blue-500"
+                  : // Unselected style
+                    "bg-black text-white border border-white hover:bg-white hover:text-black"
               }`}
           >
-            {option}
-          </h2>
+            <span className="text-center text-sm sm:text-base">{option}</span>
+          </div>
         ))}
       </div>
     </div>

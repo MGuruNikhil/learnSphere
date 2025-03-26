@@ -2,227 +2,162 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { GoogleGenerativeAI } from "@google/generative-ai"; // Ensure you've installed this package
 import QuizCardItem from "./QuizCardItem";
 import StepProgress from "./StepProgress";
 
 export default function QuizKingDisplay() {
   const { id } = useParams();
-  const [courseData, setCourseData] = useState(null);
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // UI state for quiz interaction
+  // UI states for quiz interaction
   const [stepCount, setStepCount] = useState(0);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
   const [correctAnswer, setCorrectAnswer] = useState("");
+  const [score, setScore] = useState(0);
+  const [answersStatus, setAnswersStatus] = useState([]); // track correctness of each question
+  const [disableOptions, setDisableOptions] = useState(false); // disable once user selects an option
 
-  // Fetch course data from API endpoint
+  // Fetch quiz questions from backend API endpoint
   useEffect(() => {
-    async function fetchCourseData() {
+    async function fetchQuizQuestions() {
       try {
-        const response = await fetch(`/api/courses/${id}`);
+        const response = await fetch(`/api/quiz/${id}`);
         if (!response.ok) {
-          throw new Error("Failed to fetch course data");
+          throw new Error("Failed to fetch quiz questions");
         }
         const data = await response.json();
-        setCourseData(data);
+        setQuizQuestions(data.quizQuestions);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
-    fetchCourseData();
+    fetchQuizQuestions();
   }, [id]);
 
-  // Helper function to extract JSON content from a markdown code block
-  const extractJSONFromCodeBlock = (text) => {
-    const regex = /```json\s*([\s\S]*?)\s*```/;
-    const match = text.match(regex);
-    return match ? match[1] : text;
-  };
-
-  // Generate quiz questions using the standard Gemini model after courseData is loaded
-  useEffect(() => {
-    async function generateQuizQuestions() {
-      if (!courseData) return;
-      try {
-        const prompt = `
-You are provided with a course outline and details below. Your task is to generate a set of quiz questions that test understanding of the course content.
-
-Course Title: ${courseData.outline.courseTitle}
-Course Summary: ${courseData.outline.courseSummary}
-Chapters and Topics:
-${courseData.outline.chapters
-  .map(
-    (chapter) => `
-Chapter: ${chapter.chapterTitle}
-Summary: ${chapter.chapterSummary}
-Topics: ${chapter.topics.join(", ")}
-`
-  )
-  .join("\n")}
-
-Please generate quiz questions as a JSON array. Each quiz question should be an object with the following keys:
-- "question": The quiz question text.
-- "options": An array of possible answer options.
-- "correctAnswer": The correct answer from the options.
-
-Below are two examples of correctly formatted quiz questions:
-
-Example 1:
-\`\`\`json
-[
-  {
-    "question": "What does SED stand for in the context of darshan services?",
-    "options": [
-      "Special Entry Darshan",
-      "Standard Entry Darshan",
-      "Super Exclusive Darshan",
-      "Selective Entry Darshan"
-    ],
-    "correctAnswer": "Special Entry Darshan"
-  },
-  {
-    "question": "Which of the following is a benefit of SED?",
-    "options": [
-      "Long waiting times",
-      "Reduced queues",
-      "Unorganized entry",
-      "No booking process"
-    ],
-    "correctAnswer": "Reduced queues"
-  }
-]
-\`\`\`
-
-Example 2:
-\`\`\`json
-[
-  {
-    "question": "What is the primary purpose of SED?",
-    "options": [
-      "To increase waiting times",
-      "To offer a premium darshan experience",
-      "To provide free darshan",
-      "To discourage online booking"
-    ],
-    "correctAnswer": "To offer a premium darshan experience"
-  },
-  {
-    "question": "How can one book SED?",
-    "options": [
-      "By visiting the TTD website",
-      "By calling customer service",
-      "By visiting the temple in person",
-      "Through social media"
-    ],
-    "correctAnswer": "By visiting the TTD website"
-  }
-]
-\`\`\`
-
-Based on the course outline above, generate a new set of quiz questions.
-        `.trim();
-
-        // Initialize the Gemini API client using your API key
-        const genAI = new GoogleGenerativeAI("AIzaSyB1H4OY1bqt8CUJbMNCtGBUNyqc64YvAyI");
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const result = await model.generateContent(prompt);
-
-        // Assume the response is in a markdown code block with JSON content
-        const responseText = result.response.text();
-        const jsonString = extractJSONFromCodeBlock(responseText);
-        const parsedQuizQuestions = JSON.parse(jsonString);
-        setQuizQuestions(parsedQuizQuestions);
-      } catch (err) {
-        setError(err.message || "Error generating quiz questions");
-      }
-    }
-    generateQuizQuestions();
-  }, [courseData]);
-
+  // Check the user's selected answer
   const checkAnswer = (selectedOption, currentQuiz) => {
-    if (selectedOption === currentQuiz.correctAnswer) {
-      setIsCorrectAnswer(true);
+    if (disableOptions) return;
+    setDisableOptions(true);
+
+    const answerIsCorrect = selectedOption === currentQuiz.correctAnswer;
+    setIsCorrectAnswer(answerIsCorrect);
+
+    if (answerIsCorrect) {
+      setScore((prev) => prev + 1);
     } else {
-      setIsCorrectAnswer(false);
       setCorrectAnswer(currentQuiz.correctAnswer);
     }
 
-    // Move to the next question after a short delay
+    setAnswersStatus((prev) => [...prev, answerIsCorrect]);
+
+    // Move to the next question after 3 seconds
     setTimeout(() => {
       if (stepCount < quizQuestions.length - 1) {
         setStepCount((prevStep) => prevStep + 1);
-        setIsCorrectAnswer(null); // Reset the answer state for the next question
+        setIsCorrectAnswer(null);
       }
-    }, 1000); // Adjust the delay as needed
+      setDisableOptions(false);
+    }, 3000);
   };
 
   const goToCoursePage = () => {
-    // Navigate to course page (adjust the URL as needed)
-    window.location.href = `/courses/${id}`;
+    window.location.href = `/course/${id}`;
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-20">
-      <h1 className="text-2xl font-bold mb-4 text-white">Quiz King</h1>
-      {loading && <p className="text-white">Loading Quiz...</p>}
-      {error && (
-        <pre className="text-red-400 bg-gray-800 p-4 rounded">{error}</pre>
+    <div className="w-full min-h-screen bg-black px-4 py-20 sm:px-8">
+      <h1 className="text-3xl font-bold mb-6 text-white text-center">
+        Quiz King
+      </h1>
+
+      {loading && (
+        <p className="text-white text-xl text-center">
+          Generating the quiz...
+        </p>
       )}
+      {error && (
+        <pre className="text-red-400 bg-gray-800 p-4 rounded mx-auto max-w-xl">
+          Try again later...
+        </pre>
+      )}
+
       {!loading && quizQuestions.length > 0 ? (
         <>
+          {/* Step Progress Component */}
           <StepProgress
             data={quizQuestions}
             stepCount={stepCount}
+            answersStatus={answersStatus}
             setStepCount={(value) => {
-              setStepCount(value);
-              setIsCorrectAnswer(null); // reset answer state on step change
+              if (!disableOptions) {
+                setStepCount(value);
+                setIsCorrectAnswer(null);
+              }
             }}
           />
 
-          <div>
+          {/* Quiz Card Container */}
+          <div className="max-w-xl mx-auto w-full bg-black border border-white rounded-lg p-6 mt-6">
             <QuizCardItem
-              className="mt-10 mb-5"
               quiz={quizQuestions[stepCount]}
+              disableOptions={disableOptions}
               userSelectedOption={(v) =>
                 checkAnswer(v, quizQuestions[stepCount])
               }
             />
           </div>
+
+          {/* Feedback */}
           {isCorrectAnswer === false && (
-            <div className="border p-3 border-red-700 bg-red-200 rounded-lg mt-16">
+            <div className="max-w-xl mx-auto w-full border border-red-600 bg-red-200 rounded-lg mt-6 p-4 text-center">
               <h2 className="font-bold text-lg text-red-600">Incorrect</h2>
               <p className="text-red-600">
-                Correct answer is {correctAnswer}
+                Correct answer:{" "}
+                <span className="font-mono">{correctAnswer}</span>
               </p>
             </div>
           )}
           {isCorrectAnswer === true && (
-            <div className="border p-3 border-green-700 bg-green-200 rounded-lg">
+            <div className="max-w-xl mx-auto w-full border border-green-600 bg-green-200 rounded-lg mt-6 p-4 text-center">
               <h2 className="font-bold text-lg text-green-600">Correct</h2>
               <p className="text-green-600">Your answer is correct</p>
             </div>
           )}
 
-          {/* Show "Go to Course Page" button on the last quiz question */}
+          {/* Score Display (shown at last question) */}
           {stepCount === quizQuestions.length - 1 && (
-            <div className="flex justify-center mt-8">
-              <button
-                onClick={goToCoursePage}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md"
-              >
-                Go to Course Page
-              </button>
+            <div className="flex flex-col items-center mt-8">
+              <div className="text-white mb-4">
+                Your Score:{" "}
+                <span className="font-bold text-green-500">{score}</span> /{" "}
+                <span className="font-bold">{quizQuestions.length}</span>
+              </div>
             </div>
           )}
         </>
       ) : (
-        !loading && <p className="text-white">Loading Quiz...</p>
+        !loading && (
+          <p className="text-white text-xl text-center">
+            Generating the quiz...
+          </p>
+        )
       )}
+
+      <div className="flex justify-center mt-8">
+        <button
+          onClick={goToCoursePage}
+          className="px-6 py-3 bg-black text-white rounded-md border border-white/50 
+                     shadow-[0_0_10px_rgba(255,255,255,0.3)] 
+                     hover:shadow-[0_0_15px_rgba(255,255,255,0.5)]
+                     transition-shadow duration-300"
+        >
+          Go to Course Page
+        </button>
+      </div>
     </div>
   );
 }

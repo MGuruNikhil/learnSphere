@@ -1,23 +1,26 @@
 import React from "react";
 
-function StepProgress({ data, stepCount, setStepCount }) {
+function StepProgress({ data, stepCount, answersStatus, setStepCount }) {
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
+    <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
       {data.map((_, index) => {
-        const isActive = index === stepCount;
-        const isCompleted = index < stepCount;
+        // Default gray for unanswered
+        let bgColor = "bg-gray-400";
+
+        // If the user has answered this question, color it green or red
+        if (index < answersStatus.length) {
+          bgColor = answersStatus[index] ? "bg-green-500" : "bg-red-500";
+        }
+        // If it's the current question and not answered yet
+        else if (index === stepCount) {
+          bgColor = "bg-blue-500";
+        }
+
         return (
           <div
             key={index}
             onClick={() => setStepCount(index)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer
-              ${
-                isCompleted
-                  ? "bg-[#4CAF50] text-[#FFFFFF]" // Green for completed
-                  : isActive
-                  ? "bg-[#2196F3] text-[#FFFFFF]" // Blue for active
-                  : "bg-[#E0E0E0] text-[#757575]" // Gray for default
-              }`}
+            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center cursor-pointer text-white text-sm sm:text-base ${bgColor}`}
           >
             {index + 1}
           </div>

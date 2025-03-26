@@ -18,9 +18,10 @@ export async function POST(req) {
     const courseType = formData.get("courseType");
     const difficultyLevel = formData.get("difficultyLevel");
     const userName = formData.get("userName");
+    const email = formData.get("email"); // New: Extract email from form data
 
     // Validate required fields
-    if (!msg || !userName || !courseType || !difficultyLevel || pdfFiles.length === 0) {
+    if (!msg || !userName || !courseType || !difficultyLevel || !email || pdfFiles.length === 0) {
       return new NextResponse(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -116,8 +117,10 @@ export async function POST(req) {
       await client.connect();
       const db = client.db("courseDB");
       const collection = db.collection("courseOutlines");
+      // New: Insert email along with the other fields
       data = await collection.insertOne({
         userName,
+        email, // Save the email in the DB
         courseType,
         difficultyLevel,
         outline: aiResult,

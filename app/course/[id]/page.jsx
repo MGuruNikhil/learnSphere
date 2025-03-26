@@ -31,15 +31,23 @@ export default function Course() {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center bg-black min-h-screen">
+      <div></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="flex items-center justify-center min-h-screen">
+    <div>Try Again..</div>
+    </div>
   }
 
   if (!courseData) {
-    return <p>Course not found</p>;
+    return <div className="flex items-center justify-center min-h-screen">
+    <div>Crouse not found</div>
+    </div>
   }
 
   return (

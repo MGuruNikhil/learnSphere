@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser, SignInButton } from "@clerk/nextjs";
+
 
 export default function UploadPage() {
+  const { isSignedIn, user } = useUser();
   const [msg, setMsg] = useState("");
   const [courseType, setCourseType] = useState("");
   const [difficultyLevel, setDifficultyLevel] = useState("");
@@ -28,6 +31,7 @@ export default function UploadPage() {
     formData.append("courseType", courseType);
     formData.append("difficultyLevel", difficultyLevel);
     formData.append("userName", "your-username");
+    formData.append('email', user.emailAddresses[0].emailAddress);
 
     for (let i = 0; i < pdfFiles.length; i++) {
       formData.append("pdfFiles", pdfFiles[i]);

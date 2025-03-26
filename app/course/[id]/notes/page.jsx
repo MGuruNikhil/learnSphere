@@ -2,186 +2,284 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { GoogleGenerativeAI } from "@google/generative-ai"; // Ensure you've installed this package
 
-export default function DescriptiveQA() {
+export default function GeminiChaptersByTopicRaw() {
   const { id } = useParams();
-  const [courseData, setCourseData] = useState(null);
-  const [descriptiveQA, setDescriptiveQA] = useState([]);
+  const [chapterResponses, setChapterResponses] = useState([]);
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+  const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  // Fetch course data from API endpoint
+  // Fetch note data from API route
   useEffect(() => {
-    async function fetchCourseData() {
+    async function fetchNoteData() {
       try {
-        const response = await fetch(`/api/courses/${id}`);
+        const response = await fetch(`/api/notes/${id}`);
         if (!response.ok) {
-          throw new Error("Failed to fetch course data");
+          throw new Error("Failed to fetch note data");
         }
         const data = await response.json();
-        setCourseData(data);
+        // The API returns an object with a "note" key containing chapters
+        setChapterResponses(data.note.chapters);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
-    fetchCourseData();
+    if (id) {
+      fetchNoteData();
+    }
   }, [id]);
 
-  // Fetch notes by courseId
-  async function fetchNotes(courseId) {
-    try {
-      const response = await fetch(`/api/notes/${courseId}`);
-      if (response.ok) {
-        const data = await response.json();
-        // Assuming your API returns { notes: [...] }
-        return data.notes;
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }
+  // Reset topic index when chapter changes
+  useEffect(() => {
+    setCurrentTopicIndex(0);
+  }, [currentChapterIndex]);
 
-  // Save notes to the database
-  async function saveNotes(courseId, notes) {
-    try {
-      await fetch(`/api/notes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId, notes }),
-      });
-    } catch (err) {
-      console.error("Failed to save notes:", err);
+  // Navigation Handlers
+  const handleTopicNext = () => {
+    const currentArticles = chapterResponses[currentChapterIndex].articles;
+    if (currentTopicIndex < currentArticles.length - 1) {
+      setCurrentTopicIndex(currentTopicIndex + 1);
+    } else if (currentChapterIndex < chapterResponses.length - 1) {
+      setCurrentChapterIndex(currentChapterIndex + 1);
+      setCurrentTopicIndex(0);
     }
-  }
-
-  // Helper function to extract JSON content from a markdown code block
-  const extractJSONFromCodeBlock = (text) => {
-    const regex = /```json\s*([\s\S]*?)\s*```/;
-    const match = text.match(regex);
-    return match ? match[1] : text;
   };
 
-  // Generate descriptive pages using the standard Gemini model after courseData is loaded
-  useEffect(() => {
-    async function generateDescriptiveQA() {
-      if (!courseData) return;
-
-      // Check if notes already exist
-      const existingNotes = await fetchNotes(id);
-      if (existingNotes && Array.isArray(existingNotes)) {
-        setDescriptiveQA(existingNotes);
-        return; 
-      }
-
-      try {
-        // Construct a detailed prompt that includes course data and examples for descriptive pages
-        const prompt = `You are provided with a course outline and details below. Your task is to generate a structured textbook-style content breakdown, organized by chapters and pages, with each page containing 250-300 words.
-
-### Course Information:
-Course Title: ${courseData.outline.courseTitle}
-Course Summary: ${courseData.outline.courseSummary}
-
-### Chapters and Topics:
-${courseData.outline.chapters
-  .map(
-    (chapter) => `
-Chapter: ${chapter.chapterTitle}
-Summary: ${chapter.chapterSummary}
-Topics: ${chapter.topics.join(", ")}
-`
-  )
-  .join("\n")}
-
-### Output Format:
-Generate the output as a JSON array. Each entry in the array should represent a chapter and include:
-- "chapter": The chapter title.
-- "pages": An array of objects, each representing a page, containing:
-  - "pageNumber": The page number.
-  - "title": The title of the page.
-  - "content": A detailed explanation of the topic covered on that page (250-300 words).
-
-Below is an example of the expected output:
-
-\`\`\`json
-[
-  {
-    "chapter": "Understanding Special Entry Darshan (SED)",
-    "pages": [
-      {
-        "pageNumber": 1,
-        "title": "What is Special Entry Darshan?",
-        "content": "The Special Entry Darshan (SED) at Tirumala Tirupati Devasthanams (TTD) is a system designed to provide a streamlined and convenient darshan experience for devotees. Unlike the traditional Sarva Darshan, where pilgrims may have to wait for long hours, the SED offers a pre-booked time slot for visiting the temple. This facility ensures that devotees can plan their pilgrimage in advance, minimizing uncertainty and reducing wait times significantly. \n\nThe SED system was introduced to enhance the efficiency of darshan and provide an orderly experience. Devotees can book their darshan slots online through the official TTD website, selecting their preferred date and time. The ticket usually comes with additional benefits, such as quicker access to the sanctum and, in some cases, complimentary prasadam. \n\nOverall, the SED is an excellent option for those looking to avoid the long queues and ensure a smooth and spiritually fulfilling darshan at Tirumala."
-      },
-      {
-        "pageNumber": 2,
-        "title": "Benefits of SED",
-        "content": "The Special Entry Darshan (SED) provides multiple benefits to devotees seeking a streamlined and efficient darshan experience. One of the primary advantages is the significantly reduced waiting time. Since the slots are pre-booked, pilgrims no longer have to stand in long queues for hours, ensuring a more comfortable experience. \n\nAnother key benefit is the organized entry process. With specific time slots allocated, the flow of devotees is regulated, leading to a more peaceful and structured visit. The SED also ensures that pilgrims can plan their trips better, as they have a confirmed darshan schedule in advance. \n\nMoreover, the SED ticket sometimes includes perks like access to special queue lines and prasadam offerings, making the pilgrimage more fulfilling. Overall, this system enhances the overall experience by providing a well-structured, time-efficient, and comfortable visit to the sacred shrine."
-      }
-    ]
-  }
-]
-\`\`\``.trim();
-
-        // Initialize the Gemini API client using your API key
-        const genAI = new GoogleGenerativeAI("AIzaSyB1H4OY1bqt8CUJbMNCtGBUNyqc64YvAyI");
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const result = await model.generateContent(prompt);
-
-        // Wait for the response text (if needed)
-        const responseText = await result.response.text();
-        const jsonString = extractJSONFromCodeBlock(responseText);
-        const parsedDescriptiveQA = JSON.parse(jsonString);
-
-        console.log("Parsed descriptiveQA:", parsedDescriptiveQA);
-
-        // If the parsed result is not an array but an object containing an array, adjust accordingly.
-        const notesArray = Array.isArray(parsedDescriptiveQA)
-          ? parsedDescriptiveQA
-          : parsedDescriptiveQA.notes || [];
-
-        // Save notes to the database
-        await saveNotes(id, notesArray);
-
-        setDescriptiveQA(notesArray);
-      } catch (err) {
-        setError(err.message || "Error generating descriptive pages");
-      }
+  const handleTopicPrev = () => {
+    if (currentTopicIndex > 0) {
+      setCurrentTopicIndex(currentTopicIndex - 1);
+    } else if (currentChapterIndex > 0) {
+      const prevArticles = chapterResponses[currentChapterIndex - 1].articles;
+      setCurrentChapterIndex(currentChapterIndex - 1);
+      setCurrentTopicIndex(prevArticles.length - 1);
     }
-    generateDescriptiveQA();
-  }, [courseData, id]);
+  };
+
+  const handleChapterSelect = (index) => {
+    setCurrentChapterIndex(index);
+    setCurrentTopicIndex(0);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Generating the notes...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Try again later...
+      </div>
+    );
+  }
+
+  if (!chapterResponses.length) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Generating the notes...
+      </div>
+    );
+  }
+
+  const currentChapter = chapterResponses[currentChapterIndex];
+  const currentArticle = currentChapter.articles[currentTopicIndex];
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-20">
-      <h1 className="text-2xl font-bold mb-4 text-white">Course Content</h1>
-      {loading && <p className="text-white">Loading course data...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-      {!loading && Array.isArray(descriptiveQA) && descriptiveQA.length > 0 ? (
-        <div className="flex flex-col gap-8">
-          {descriptiveQA.map((chapter, chapterIdx) => (
-            <div key={chapterIdx} className="border border-gray-700 rounded p-4 bg-gray-900">
-              <h2 className="text-xl font-bold mb-2 text-white">
-                Chapter: {chapter.chapter}
-              </h2>
-              {chapter.pages.map((page, pageIdx) => (
-                <div key={pageIdx} className="mb-4 p-4 border border-gray-600 rounded bg-gray-800">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold text-white">
-                      Page {page.pageNumber}: {page.title}
-                    </span>
-                  </div>
-                  <p className="text-gray-300">{page.content}</p>
-                </div>
-              ))}
-            </div>
-          ))}
+    <div className="container py-20">
+      {/* Chapter Header */}
+      <header className="chapter-header">
+        <h1>{currentChapter.chapter}</h1>
+      </header>
+
+      {/* Chapter Dots Navigation */}
+      <div className="chapter-dots">
+        {chapterResponses.map((_, idx) => (
+          <span
+            key={idx}
+            className={`dot ${idx === currentChapterIndex ? "active" : ""}`}
+            onClick={() => handleChapterSelect(idx)}
+          />
+        ))}
+      </div>
+
+      {/* Topic Navigation Controls */}
+      <div className="topic-navigation">
+        <button onClick={handleTopicPrev} className="nav-button">
+          Previous Topic
+        </button>
+        <span className="page-info">
+          Topic {currentTopicIndex + 1} of {currentChapter.articles.length}
+        </span>
+        <button onClick={handleTopicNext} className="nav-button">
+          Next Topic
+        </button>
+      </div>
+
+      {/* Topic Content */}
+      <section className="content-section">
+        <div className="article">
+          <h2>{currentArticle.topic}</h2>
+          {currentArticle.pages[0] && (
+            <>
+              <div
+                className="page-title"
+                dangerouslySetInnerHTML={{
+                  __html: currentArticle.pages[0].title,
+                }}
+              />
+              <div
+                className="page-content"
+                dangerouslySetInnerHTML={{
+                  __html: currentArticle.pages[0].content,
+                }}
+              />
+            </>
+          )}
         </div>
-      ) : (
-        !loading && <p className="text-white">No notes available</p>
-      )}
+      </section>
+
+      <style jsx>{`
+        .container {
+          font-family: Arial, sans-serif;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+        /* Chapter dots */
+        .chapter-dots {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        .dot {
+          height: 12px;
+          width: 12px;
+          margin: 0 5px;
+          background-color: #bbb;
+          border-radius: 50%;
+          display: inline-block;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        .dot.active {
+          background-color: #0070f3;
+        }
+        /* Chapter header */
+        .chapter-header h1 {
+          text-align: center;
+          margin-bottom: 30px;
+          font-size: 2rem;
+        }
+        /* Topic Navigation */
+        .topic-navigation {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        .topic-navigation .nav-button {
+          background-color: #0070f3;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          margin: 0 10px;
+          font-size: 1rem;
+          transition: background-color 0.2s ease;
+          white-space: nowrap;
+        }
+        .topic-navigation .nav-button:hover {
+          background-color: #005bb5;
+        }
+        .page-info {
+          font-size: 1rem;
+          font-weight: bold;
+        }
+        /* Topic content */
+        .content-section {
+          line-height: 1.6;
+          padding: 0 10px;
+        }
+        .article {
+          margin-bottom: 30px;
+        }
+        .article h2 {
+          font-size: 1.75rem;
+          margin-bottom: 15px;
+        }
+        .page-title h3 {
+          font-size: 1.5rem;
+          margin-bottom: 10px;
+        }
+        .page-content h4 {
+          font-size: 1.25rem;
+          margin-bottom: 10px;
+        }
+        .page-content p {
+          font-size: 1rem;
+        }
+
+        /* Responsive Styles for Mobile */
+        @media (max-width: 768px) {
+          .container {
+          }
+          .chapter-header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+          }
+          .chapter-dots {
+            margin-bottom: 15px;
+          }
+          .dot {
+            height: 10px;
+            width: 10px;
+            margin: 0 4px;
+          }
+          .topic-navigation {
+            /* Keep the buttons on the same line */
+            flex-direction: row;
+            flex-wrap: wrap; /* Allows wrapping if needed on very small screens */
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+          }
+          .topic-navigation .nav-button {
+            margin: 5px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+          }
+          .page-info {
+            font-size: 0.9rem;
+            margin: 5px;
+            white-space: nowrap; /* Prevents line break */
+          }
+          .article h2 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-align: center;
+          }
+          .page-title h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            text-align: center;
+          }
+          .page-content h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+          }
+          .page-content p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+          }
+        }
+      `}</style>
     </div>
   );
 }
