@@ -21,7 +21,7 @@ export default function Hero() {
         </div>
       </h2>
       <p className="text-center text-neutral-500 dark:text-neutral-400 mt-4">
-        The best notebook experience you &apos ll ever have.
+        The best notebook experience you&apos;ll ever have.
       </p>
       <div className="flex justify-center mt-8">
         <AnimatedModalDemo /> 

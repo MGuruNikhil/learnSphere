@@ -54,6 +54,7 @@ export default function Dashboard() {
   }
 
   if (error) {
+    console.log("Error fetching courses:", error);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Try Again...</p>
