@@ -1,12 +1,9 @@
 import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(request, contextPromise) {
+export async function GET(request, { params }) {
   try {
-    // First, await the context promise
-    const context = await contextPromise;
-    // Then, access the params property
-    const id = context.params.id;
+    const { id } = await params;
     const uri = process.env.DATABASE_URL;
     
     if (!uri) {

@@ -40,7 +40,9 @@ export default function Dashboard() {
         <p className="mb-4 text-xl font-semibold">
           Please sign in to access your dashboard.
         </p>
-        <SignInButton />
+        <div className="px-6 py-3 rounded-lg shadow-md bg-pink-500 hover:bg-pink-600 transition-colors">
+          <SignInButton />
+        </div>
       </div>
     );
   }
