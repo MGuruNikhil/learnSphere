@@ -72,7 +72,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-white p-6">
+    <div className="flex flex-col items-center justify-center min-h-screen text-white p-6 pt-[83px]">
       <h1 className="text-3xl font-bold mb-6">Generate Course Material</h1>
       <form
         onSubmit={handleSubmit}
