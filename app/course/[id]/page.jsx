@@ -20,6 +20,7 @@ export default function Course() {
         }
         const data = await response.json();
         setCourseData(data);
+        console.log("Course Data:", data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -60,7 +61,7 @@ export default function Course() {
         </div>
       </div>
       <StudyMaterial id={id} />
-      <Chapter />
+      <Chapter chapters={courseData.outline.chapters} />
     </div>
   );
 }
